@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "19733807388",
+    "firebase_url": "https://student-cover-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "student-cover",
+    "storage_bucket": "student-cover.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:19733807388:android:79403c325fefe8088abad9",
+        "android_client_info": {
+          "package_name": "com.studentcover.studentcover.student_cover"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "19733807388-llcgv8nsbqiflj23quut5vmtbe634h1e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5pKfL3VfV09QD7SUb8IOzAHWRllvHMuE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "19733807388-llcgv8nsbqiflj23quut5vmtbe634h1e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
