@@ -10,17 +10,17 @@ class DestinationDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.white),
-      padding: EdgeInsets.symmetric(vertical: 24),
-      child: Column(
-        key: const ValueKey(1),
-        children: [
-          InputField(title: "Country"),
-          InputField(title: "Desired University"),
-          InputField(title: "Course"),
-          InputField(title: "Education Level"),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20),
+        child: Column(
+          key: const ValueKey(1),
+          children: [
+            InputField(title: "Country"),
+            InputField(title: "Desired University"),
+            InputField(title: "Course"),
+            InputField(title: "Education Level"),
+            SizedBox(height: 20),
+            Row(
               children: [
                 Expanded(
                   child: ElevatedButton(
@@ -46,8 +46,8 @@ class DestinationDetails extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

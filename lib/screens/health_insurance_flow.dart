@@ -1,5 +1,14 @@
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:student_cover/constants.dart';
+import 'package:student_cover/widgets/feature_row_check.dart';
+import 'package:student_cover/widgets/insurance_flow_widgets/apply_for_insurance.dart';
+import 'package:student_cover/widgets/insurance_flow_widgets/insurance_api_part.dart';
 import 'package:student_cover/widgets/screen_app_bar.dart';
+import 'package:student_cover/widgets/study_destinations.dart';
+import 'package:student_cover/widgets/testimonials.dart';
+import 'package:student_cover/widgets/top_universities.dart';
+import 'package:student_cover/widgets/trusted_by.dart';
 
 class HealthInsuranceFlow extends StatefulWidget {
   static final String screenName = "HealthInsuranceFlow";
@@ -12,6 +21,10 @@ class HealthInsuranceFlow extends StatefulWidget {
 class _HealthInsuranceFlowState extends State<HealthInsuranceFlow> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(backgroundColor: Colors.white, appBar: getScreenAppBar("Health Insurance"));
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: getScreenAppBar("Health Insurance"),
+      body: ListView(children: [ApplyForInsurance(), SizedBox(height: 24), InsuranceAIChat(), SizedBox(height: 24), TopUniversities(), TrustedBy()]),
+    );
   }
 }

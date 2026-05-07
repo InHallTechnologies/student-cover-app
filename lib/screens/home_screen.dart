@@ -28,11 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
           elevation: 0, // Using custom shadow for premium look
           shape: const CircleBorder(),
           onPressed: () {},
-          child: SizedBox(
-            width: 24,
-            height: 24,
-            child: ColorFiltered(colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn), child: Image.asset("images/chat.png")),
-          ),
+          child: Image.asset("images/chat_icon_round.png"),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

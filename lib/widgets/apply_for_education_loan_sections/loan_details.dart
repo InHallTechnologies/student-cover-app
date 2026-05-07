@@ -10,14 +10,14 @@ class LoanDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.white),
-      padding: EdgeInsets.symmetric(vertical: 24),
-      child: Column(
-        key: const ValueKey(2),
-        children: [
-          InputField(title: "Loan Amount"),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20),
+        child: Column(
+          key: const ValueKey(2),
+          children: [
+            InputField(title: "Loan Amount"),
+            SizedBox(height: 20),
+            Row(
               children: [
                 Expanded(
                   child: ElevatedButton(
@@ -41,8 +41,8 @@ class LoanDetails extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

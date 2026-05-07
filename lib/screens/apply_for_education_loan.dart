@@ -31,7 +31,7 @@ class _ApplyForEducationLoanState extends State<ApplyForEducationLoan> with Sing
     _animation = Tween<double>(
       begin: currentIndex.toDouble(),
       end: newIndex.toDouble(),
-    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack));
+    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic));
     _animationController.forward(from: 0);
     setState(() {
       currentIndex = newIndex;
@@ -58,38 +58,36 @@ class _ApplyForEducationLoanState extends State<ApplyForEducationLoan> with Sing
               child: Opacity(opacity: 0.2, child: Image.asset("images/student_cover_logo_only_white.png", width: 200)),
             ),
           ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                ApplyEducationLoanTitle(),
-                FormProgressIndicator(progress: currentIndex / 3, currentIndex: currentIndex),
-                Container(
-                  margin: EdgeInsets.all(16),
-                  child: AnimatedBuilder(
-                    animation: _animationController,
-                    builder: (context, widget) {
-                      return Stack(
-                        children: [
-                          Transform.translate(
-                            offset: getOffset(screenWidth, 0.0 - _animation.value),
-                            child: PersonalDetails(updateSection: updateSection),
-                          ),
-                          Transform.translate(
-                            offset: getOffset(screenWidth, 1.0 - _animation.value),
-                            child: DestinationDetails(updateSection: updateSection),
-                          ),
-                          Transform.translate(
-                            offset: getOffset(screenWidth, 2 - _animation.value),
-                            child: LoanDetails(updateSection: updateSection),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ApplyEducationLoanTitle(),
+              FormProgressIndicator(progress: currentIndex / 3, currentIndex: currentIndex),
+              Container(
+                margin: EdgeInsets.all(16),
+                child: AnimatedBuilder(
+                  animation: _animationController,
+                  builder: (context, widget) {
+                    return Stack(
+                      children: [
+                        Transform.translate(
+                          offset: getOffset(screenWidth, 0.0 - _animation.value),
+                          child: PersonalDetails(updateSection: updateSection),
+                        ),
+                        Transform.translate(
+                          offset: getOffset(screenWidth, 1.0 - _animation.value),
+                          child: DestinationDetails(updateSection: updateSection),
+                        ),
+                        Transform.translate(
+                          offset: getOffset(screenWidth, 2 - _animation.value),
+                          child: LoanDetails(updateSection: updateSection),
+                        ),
+                      ],
+                    );
+                  },
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),
