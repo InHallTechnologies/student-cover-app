@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:student_cover/screens/admission_counselling_flow.dart';
 import 'package:student_cover/screens/education_loan_flow.dart';
 import 'package:student_cover/screens/health_insurance_flow.dart';
 
@@ -51,7 +52,7 @@ class ServiceSelector extends StatelessWidget {
           labelColor: const Color(0xFFE68A00),
           labelBgColor: const Color(0xFFFFF5E6),
           context: context,
-          routeTo: EducationLoanFlow.screenName,
+          routeTo: AdmissionCounsellingFlow.screenName,
         ),
         ServiceItem(
           itemWidth: itemWidth,

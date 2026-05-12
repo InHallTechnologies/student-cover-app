@@ -1,93 +1,71 @@
-import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:student_cover/constants.dart';
-import 'package:student_cover/widgets/input_field.dart';
 
 class AutoCompleteInputField extends StatefulWidget {
-  final ValueChanged<String> onChange;
-  final Future<List<String>> Function(String) optionsGenerator;
   final String title;
+  final Function(String) onChange;
+  final Function(String) optionsGenerator;
+  IconData? iconData;
 
-  const AutoCompleteInputField({super.key, required this.onChange, required this.optionsGenerator, this.title = "Country"});
-
+  AutoCompleteInputField({super.key, required this.title, required this.onChange, required this.optionsGenerator, this.iconData});
   @override
   State<AutoCompleteInputField> createState() => _AutoCompleteInputFieldState();
 }
 
-class _AutoCompleteInputFieldState extends State<AutoCompleteInputField> {
+class _AutoCompleteInputFieldState extends State<AutoCompleteInputField> with SingleTickerProviderStateMixin {
   final LayerLink _layerLink = LayerLink();
   final OverlayPortalController _overlayPortalController = OverlayPortalController();
-  late TextEditingController _textEditingController;
-
-  List<String> _allOptions = [];
-  List<String> _filteredOptions = [];
+  final TextEditingController _textEditingController = TextEditingController();
+  final GlobalKey _fieldKey = GlobalKey();
+  List<String> optionsList = [];
   bool _isLoading = false;
-  bool _suppressListener = false;
+
+  void handleTextEditControlListener() async {
+    try {
+      if (_textEditingController.text.isEmpty) {
+        _overlayPortalController.hide();
+        return;
+      }
+
+      if (optionsList.contains(_textEditingController.text)) {
+        _overlayPortalController.hide();
+        return;
+      }
+      setState(() {
+        _isLoading = true;
+        optionsList = [];
+      });
+
+      List<String> options = await widget.optionsGenerator(_textEditingController.text);
+      if (options.isNotEmpty && _textEditingController.text.isNotEmpty) {
+        _overlayPortalController.show();
+      }
+      setState(() {
+        optionsList = options;
+      });
+    } catch (e) {
+      debugPrint("Something went wrong");
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    _textEditingController = TextEditingController();
-    _textEditingController.addListener(_onTextChanged);
+    _textEditingController.addListener(handleTextEditControlListener);
   }
 
   @override
   void dispose() {
-    _textEditingController.removeListener(_onTextChanged);
+    _textEditingController.removeListener(handleTextEditControlListener);
     _textEditingController.dispose();
     super.dispose();
-  }
-
-  Future<void> _onTextChanged() async {
-    if (_suppressListener) return;
-
-    final currentText = _textEditingController.text.trim();
-
-    if (currentText.isEmpty) {
-      _hideOverlay();
-      return;
-    }
-
-    if (_allOptions.isEmpty) {
-      setState(() => _isLoading = true);
-      try {
-        final data = await widget.optionsGenerator(currentText);
-        _allOptions = data.map((e) => e.toString()).toList();
-      } catch (_) {
-        _allOptions = [];
-      }
-      if (!mounted) return;
-      setState(() => _isLoading = false);
-    }
-
-    _filteredOptions = _allOptions.where((option) => option.toLowerCase().contains(currentText.toLowerCase())).toList();
-    if (_filteredOptions.isNotEmpty) {
-      if (!_overlayPortalController.isShowing) {
-        _overlayPortalController.show();
-      }
-      setState(() {});
-    } else {
-      _hideOverlay();
-    }
-  }
-
-  void _hideOverlay() {
-    if (_overlayPortalController.isShowing) {
-      _overlayPortalController.hide();
-    }
-    setState(() => _filteredOptions = []);
-  }
-
-  void _onItemSelected(String value) {
-    _suppressListener = true;
-    _textEditingController.text = value;
-    _textEditingController.selection = TextSelection.collapsed(offset: value.length);
-    _suppressListener = false;
-
-    widget.onChange(value);
-    _hideOverlay();
   }
 
   @override
@@ -97,128 +75,115 @@ class _AutoCompleteInputFieldState extends State<AutoCompleteInputField> {
       child: OverlayPortal(
         controller: _overlayPortalController,
         overlayChildBuilder: (context) {
+          final renderBox = _fieldKey.currentContext?.findRenderObject() as RenderBox?;
+          final fieldWidth = renderBox?.size.width ?? 300;
           return CompositedTransformFollower(
-            link: _layerLink,
             targetAnchor: Alignment.bottomLeft,
             followerAnchor: Alignment.topLeft,
-            child: Align(alignment: Alignment.topLeft, child: _buildDropdown()),
+            link: _layerLink,
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: SizedBox(
+                height: 300,
+                width: fieldWidth,
+                child: ListView(
+                  children: List<Widget>.generate(optionsList.getRange(0, min(20, optionsList.length)).length, (index) {
+                    final option = optionsList[index];
+                    return InkWell(
+                      onTap: () {
+                        _textEditingController.removeListener(handleTextEditControlListener);
+                        _textEditingController.text = option;
+                        _overlayPortalController.hide();
+                        widget.onChange(option);
+                        _textEditingController.addListener(handleTextEditControlListener);
+                      },
+                      splashColor: kPrimaryLight.withValues(alpha: 0.08),
+                      highlightColor: kPrimaryLight.withValues(alpha: 0.05),
+                      child: AutoCompleterItem(
+                        option: option,
+                        searchKeyword: _textEditingController.text,
+                        fieldWidth: fieldWidth,
+                        iconData: widget.iconData,
+                      ),
+                    );
+                  }),
+                ),
+              ),
+            ),
           );
         },
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: InputField(title: widget.title, textEditingController: _textEditingController),
-            ),
-            if (_isLoading)
-              Padding(
-                padding: const EdgeInsets.only(left: 12, bottom: 12),
-                child: SpinKitCircle(color: kPrimaryLight, size: 28),
+            Padding(
+              padding: const EdgeInsets.only(left: 4, bottom: 8),
+              child: Text(
+                widget.title,
+                style: const TextStyle(color: textPrimary, fontSize: 14, fontWeight: FontWeight.w600, letterSpacing: 0.3),
               ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDropdown() {
-    final maxItems = _filteredOptions.length > 5 ? 5 : _filteredOptions.length;
-    final visibleItems = _filteredOptions.sublist(0, maxItems);
-
-    return Padding(
-      padding: const EdgeInsets.only(top: 4),
-      child: Material(
-        elevation: 4,
-        borderRadius: BorderRadius.circular(12),
-        shadowColor: Colors.black26,
-        child: Container(
-          constraints: const BoxConstraints(maxHeight: 240),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: border, width: 1),
-          ),
-          child: _isLoading
-              ? const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Center(
-                    child: SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: kPrimary)),
-                  ),
-                )
-              : ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    itemCount: visibleItems.length,
-                    separatorBuilder: (_, __) => Divider(height: 1, color: border.withOpacity(0.5)),
-                    itemBuilder: (context, index) {
-                      return _DropDownItem(
-                        title: visibleItems[index],
-                        searchQuery: _textEditingController.text.trim(),
-                        onTap: () => _onItemSelected(visibleItems[index]),
-                      );
-                    },
+            ),
+            TextField(
+              key: _fieldKey,
+              onChanged: widget.onChange,
+              controller: _textEditingController,
+              cursorColor: kPrimary,
+              decoration: kAuthenticationInputDecoration.copyWith(
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
+                    bottomLeft: Radius.circular(0),
+                    bottomRight: Radius.circular(0),
                   ),
                 ),
+                hintText: "Enter ${widget.title}",
+                prefixIcon: SizedBox.shrink(),
+                prefixIconConstraints: BoxConstraints.tight(Size(20, 10)),
+                suffixIcon: _isLoading ? SizedBox(width: 20, child: SpinKitFadingCircle(color: kPrimaryDark, size: 20)) : null,
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _DropDownItem extends StatelessWidget {
-  final String title;
-  final String searchQuery;
-  final VoidCallback onTap;
-
-  const _DropDownItem({required this.title, required this.searchQuery, required this.onTap});
+class AutoCompleterItem extends StatelessWidget {
+  const AutoCompleterItem({super.key, required this.option, required this.searchKeyword, required this.fieldWidth, this.iconData});
+  final String option;
+  final String searchKeyword;
+  final double fieldWidth;
+  final IconData? iconData;
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Row(
-          children: [
-            Icon(Icons.location_on_outlined, size: 18, color: textSecondary),
-            const SizedBox(width: 12),
-            Expanded(child: _buildHighlightedText()),
-          ],
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+      decoration: BoxDecoration(
+        color: cardBackground,
+        border: BoxBorder.fromLTRB(
+          left: BorderSide(width: 1, color: kGreyColor),
+          right: BorderSide(width: 1, color: kGreyColor),
+          bottom: BorderSide(width: 1, color: kGreyColor),
         ),
       ),
-    );
-  }
-
-  /// Highlights the matching portion of the text in bold
-  Widget _buildHighlightedText() {
-    if (searchQuery.isEmpty) {
-      return Text(title, style: const TextStyle(fontSize: 14, color: textPrimary));
-    }
-
-    final lowerTitle = title.toLowerCase();
-    final lowerQuery = searchQuery.toLowerCase();
-    final matchIndex = lowerTitle.indexOf(lowerQuery);
-
-    if (matchIndex == -1) {
-      return Text(title, style: const TextStyle(fontSize: 14, color: textPrimary));
-    }
-
-    final before = title.substring(0, matchIndex);
-    final match = title.substring(matchIndex, matchIndex + searchQuery.length);
-    final after = title.substring(matchIndex + searchQuery.length);
-
-    return RichText(
-      text: TextSpan(
-        style: const TextStyle(fontSize: 14, color: textPrimary),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TextSpan(text: before),
-          TextSpan(
-            text: match,
-            style: const TextStyle(fontWeight: FontWeight.w700, color: kPrimary),
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(color: kPrimaryLight.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
+            child: Icon(iconData, size: 16, color: kPrimaryDark),
           ),
-          TextSpan(text: after),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              option,
+              style: const TextStyle(color: textPrimary, fontSize: 14, fontWeight: FontWeight.w500),
+              overflow: TextOverflow.visible,
+            ),
+          ),
         ],
       ),
     );

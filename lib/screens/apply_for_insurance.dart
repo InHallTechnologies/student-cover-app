@@ -1,11 +1,13 @@
+import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:student_cover/constants.dart';
 import 'package:student_cover/screens/plan_list.dart';
 import 'package:student_cover/services/AlertManager.dart';
+import 'package:student_cover/services/SearchService.dart';
 import 'package:student_cover/widgets/auto_complete_input_field.dart';
-import 'package:student_cover/widgets/input_field.dart';
 import 'package:student_cover/widgets/screen_app_bar.dart';
 import 'package:http/http.dart' as http;
 
@@ -20,6 +22,8 @@ class CompareAndApplyInsurance extends StatefulWidget {
 class _CompareAndApplyInsuranceState extends State<CompareAndApplyInsurance> {
   String _selectedCountry = "";
   String _selectedUniversity = "";
+  Timer? fetchUniversityTimer;
+  Timer? fetchCountryTimer;
 
   @override
   Widget build(BuildContext context) {
@@ -71,6 +75,7 @@ class _CompareAndApplyInsuranceState extends State<CompareAndApplyInsurance> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     AutoCompleteInputField(
+                      iconData: CupertinoIcons.location_fill,
                       title: "Study Destination",
                       onChange: (text) {
                         setState(() {
@@ -78,14 +83,21 @@ class _CompareAndApplyInsuranceState extends State<CompareAndApplyInsurance> {
                         });
                       },
                       optionsGenerator: (newText) async {
-                        final uri = Uri.parse("https://us-central1-student-cover.cloudfunctions.net/get_country_list_shallow");
-                        final response = await http.get(uri);
-                        final items = jsonDecode(response.body) as List;
-                        return items.map((e) => e.toString()).toList();
+                        fetchCountryTimer?.cancel();
+                        final Completer completer = Completer<List<String>>();
+                        fetchCountryTimer = Timer(Duration(milliseconds: 200), () async {
+                          final uri = Uri.parse("https://us-central1-student-cover.cloudfunctions.net/get_country_list_shallow");
+                          final response = await http.get(uri);
+                          List<dynamic> items = jsonDecode(response.body) as List;
+                          items = items.where((item) => item.toString().toLowerCase().contains(newText.toLowerCase())).toList();
+                          completer.complete(items.map((e) => e.toString()).toList());
+                        });
+                        return await completer.future;
                       },
                     ),
                     const SizedBox(height: 20),
                     AutoCompleteInputField(
+                      iconData: CupertinoIcons.building_2_fill,
                       title: "Desired University",
                       onChange: (text) {
                         setState(() {
@@ -93,10 +105,18 @@ class _CompareAndApplyInsuranceState extends State<CompareAndApplyInsurance> {
                         });
                       },
                       optionsGenerator: (newText) async {
-                        final uri = Uri.parse("https://get-university-of-country-nsjtdy3gnq-uc.a.run.app/?country=$_selectedCountry");
-                        final response = await http.get(uri);
-                        final items = jsonDecode(response.body) as List;
-                        return items.map((e) => e.toString()).toList();
+                        fetchUniversityTimer?.cancel();
+                        final completer = Completer<List<String>>();
+                        fetchUniversityTimer = Timer(Duration(milliseconds: 300), () async {
+                          final uri = Uri.parse("https://get-university-of-country-nsjtdy3gnq-uc.a.run.app/?country=$_selectedCountry");
+                          final response = await http.get(uri);
+                          List<dynamic> items = jsonDecode(response.body) as List;
+                          List<String> items_string = items.map((e) => e.toString()).toList();
+                          items_string = smartSearch(items_string, newText);
+                          // items = items.where((i) => i.toString().toLowerCase().contains(newText.toLowerCase())).toList();
+                          completer.complete(items_string);
+                        });
+                        return await completer.future;
                       },
                     ),
                     const SizedBox(height: 28),

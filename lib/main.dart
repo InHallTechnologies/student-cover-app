@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:student_cover/firebase_options.dart';
+import 'package:student_cover/screens/admission_counselling_flow.dart';
 import 'package:student_cover/screens/apply_for_education_loan.dart';
 import 'package:student_cover/screens/apply_for_insurance.dart';
 import 'package:student_cover/screens/authentication_screen.dart';
@@ -33,6 +34,7 @@ class StudentCover extends StatelessWidget {
         ApplyForEducationLoan.screenName: (context) => const ApplyForEducationLoan(),
         HealthInsuranceFlow.screenName: (context) => const HealthInsuranceFlow(),
         CompareAndApplyInsurance.screenName: (context) => const CompareAndApplyInsurance(),
+        AdmissionCounsellingFlow.screenName: (context) => const AdmissionCounsellingFlow(),
       },
     );
   }
