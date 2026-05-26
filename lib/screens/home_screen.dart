@@ -5,6 +5,7 @@ import 'package:student_cover/widgets/banner_carousel.dart';
 import 'package:student_cover/widgets/quick_tools.dart';
 import 'package:student_cover/widgets/service_selector.dart';
 import 'package:student_cover/widgets/status_and_reminders.dart';
+import 'package:student_cover/widgets/upcoming_events.dart';
 
 class HomeScreen extends StatefulWidget {
   static final String screenName = "HomeScreen";
@@ -22,28 +23,28 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: background,
       appBar: MyAppBar(),
       bottomNavigationBar: BottomNavigation(),
-      floatingActionButton: Container(
-        child: FloatingActionButton(
-          backgroundColor: kPrimaryDark,
-          elevation: 0, // Using custom shadow for premium look
-          shape: const CircleBorder(),
-          onPressed: () {},
-          child: Image.asset("images/chat_icon_round.png"),
-        ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: kPrimaryDark,
+        elevation: 0, // Using custom shadow for premium look
+        shape: const CircleBorder(),
+        onPressed: () {},
+        child: Image.asset("images/chat_icon_round.png"),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       body: Padding(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
         child: ListView(
           children: [
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             BannerCarousel(),
-            SizedBox(height: 10),
+            const SizedBox(height: 24),
             ServiceSelector(),
-            SizedBox(height: 10),
-            QuickTools(),
-            SizedBox(height: 10),
+            const SizedBox(height: 24),
             StatusAndReminders(),
+            const SizedBox(height: 24),
+            UpcomingEvents(),
+            const SizedBox(height: 24),
+            QuickTools(showAdmissionCounsellingTools: true, showELTools: true, showHealthInsuranceTools: true),
           ],
         ),
       ),

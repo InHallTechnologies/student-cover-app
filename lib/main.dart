@@ -7,6 +7,7 @@ import 'package:student_cover/screens/apply_for_insurance.dart';
 import 'package:student_cover/screens/authentication_screen.dart';
 import 'package:student_cover/screens/create_account.dart';
 import 'package:student_cover/screens/education_loan_flow.dart';
+import 'package:student_cover/screens/event_registration.dart';
 import 'package:student_cover/screens/getting_started_screen.dart';
 import 'package:student_cover/screens/health_insurance_flow.dart';
 import 'package:student_cover/screens/home_screen.dart';

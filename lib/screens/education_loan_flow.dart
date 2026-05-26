@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:student_cover/constants.dart';
 import 'package:student_cover/widgets/connect_now.dart';
 import 'package:student_cover/widgets/education_loan_hero_card.dart';
+import 'package:student_cover/widgets/quick_tools.dart';
 import 'package:student_cover/widgets/screen_app_bar.dart';
 import 'package:student_cover/widgets/study_destinations.dart';
 import 'package:student_cover/widgets/testimonials.dart';
@@ -29,6 +30,11 @@ class _EducationLoanFlowState extends State<EducationLoanFlow> {
           Testimonials(),
           SizedBox(height: 24),
           TopUniversities(),
+          SizedBox(height: 24),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: QuickTools(showAdmissionCounsellingTools: false, showELTools: true, showHealthInsuranceTools: false),
+          ),
           SizedBox(height: 24),
           ConnectNow(),
           SizedBox(height: 24),

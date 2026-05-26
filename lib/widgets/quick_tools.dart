@@ -2,25 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:student_cover/constants.dart';
 
 class QuickTools extends StatelessWidget {
-  const QuickTools({super.key});
+  final bool showELTools;
+  final bool showHealthInsuranceTools;
+  final bool showAdmissionCounsellingTools;
+  const QuickTools({super.key, required this.showAdmissionCounsellingTools, required this.showELTools, required this.showHealthInsuranceTools});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const SizedBox(height: 10),
         const Text(
           "Quick Tools",
-          style: TextStyle(
-            color: textPrimary,
-            fontSize: 22,
-            fontWeight: FontWeight.w800,
-          ),
+          style: TextStyle(color: textPrimary, fontSize: 22, fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 20),
-
         QuickItemServices(
+          isVisible: showELTools,
           sectionTitle: "Education Loan",
           accentColor: const Color(0xFF1E60E6),
           iconBgColor: const Color(0xFFE8F1FF),
@@ -31,9 +29,8 @@ class QuickTools extends StatelessWidget {
             {"toolTitle": "Eligibility", "iconData": Icons.fact_check},
           ],
         ),
-        const SizedBox(height: 24),
-
         QuickItemServices(
+          isVisible: showHealthInsuranceTools,
           sectionTitle: "Health Insurance",
           accentColor: const Color(0xFFE31B54),
           iconBgColor: const Color(0xFFFFF0F5),
@@ -44,9 +41,8 @@ class QuickTools extends StatelessWidget {
             {"toolTitle": "Support", "iconData": Icons.support_agent},
           ],
         ),
-        const SizedBox(height: 24),
-
         QuickItemServices(
+          isVisible: showAdmissionCounsellingTools,
           sectionTitle: "Admission Counselling",
           accentColor: const Color(0xFF9036F5),
           iconBgColor: const Color(0xFFF6F0FF),
@@ -57,7 +53,6 @@ class QuickTools extends StatelessWidget {
             {"toolTitle": "Status", "iconData": Icons.track_changes},
           ],
         ),
-        const SizedBox(height: 20),
       ],
     );
   }
@@ -68,6 +63,7 @@ class QuickItemServices extends StatelessWidget {
   final List tools;
   final Color accentColor;
   final Color iconBgColor;
+  final bool isVisible;
 
   const QuickItemServices({
     super.key,
@@ -75,10 +71,14 @@ class QuickItemServices extends StatelessWidget {
     required this.tools,
     required this.accentColor,
     required this.iconBgColor,
+    required this.isVisible,
   });
 
   @override
   Widget build(BuildContext context) {
+    if (!isVisible) {
+      return SizedBox.shrink();
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -87,19 +87,12 @@ class QuickItemServices extends StatelessWidget {
             Container(
               width: 4,
               height: 20,
-              decoration: BoxDecoration(
-                color: accentColor,
-                borderRadius: BorderRadius.circular(4),
-              ),
+              decoration: BoxDecoration(color: accentColor, borderRadius: BorderRadius.circular(4)),
             ),
             const SizedBox(width: 12),
             Text(
               sectionTitle,
-              style: const TextStyle(
-                color: textPrimary,
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-              ),
+              style: const TextStyle(color: textPrimary, fontSize: 16, fontWeight: FontWeight.w800),
             ),
           ],
         ),
@@ -119,28 +112,15 @@ class QuickItemServices extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))],
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
                       padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: iconBgColor,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        item['iconData'],
-                        color: accentColor,
-                        size: 24,
-                      ),
+                      decoration: BoxDecoration(color: iconBgColor, shape: BoxShape.circle),
+                      child: Icon(item['iconData'], color: accentColor, size: 24),
                     ),
                     const SizedBox(height: 10),
                     Text(
@@ -160,6 +140,7 @@ class QuickItemServices extends StatelessWidget {
             },
           ),
         ),
+        const SizedBox(height: 24),
       ],
     );
   }

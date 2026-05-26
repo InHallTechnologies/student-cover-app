@@ -158,18 +158,26 @@ class AutoCompleterItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Case-insensitive index search, preserves original casing in display
+    final int matchIndex = option.toLowerCase().indexOf(searchKeyword.toLowerCase());
+    final bool hasMatch = matchIndex != -1;
+
+    final String before = hasMatch ? option.substring(0, matchIndex) : option;
+    final String match = hasMatch ? option.substring(matchIndex, matchIndex + searchKeyword.length) : '';
+    final String after = hasMatch ? option.substring(matchIndex + searchKeyword.length) : '';
+
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
       decoration: BoxDecoration(
         color: cardBackground,
-        border: BoxBorder.fromLTRB(
-          left: BorderSide(width: 1, color: kGreyColor),
-          right: BorderSide(width: 1, color: kGreyColor),
-          bottom: BorderSide(width: 1, color: kGreyColor),
+        border: Border(
+          left: BorderSide(width: 1, color: border),
+          right: BorderSide(width: 1, color: border),
+          bottom: BorderSide(width: 1, color: border),
         ),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
             padding: const EdgeInsets.all(6),
@@ -178,10 +186,20 @@ class AutoCompleterItem extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: Text(
-              option,
-              style: const TextStyle(color: textPrimary, fontSize: 14, fontWeight: FontWeight.w500),
-              overflow: TextOverflow.visible,
+            child: RichText(
+              overflow: TextOverflow.ellipsis,
+              text: TextSpan(
+                style: const TextStyle(color: textPrimary, fontSize: 14, fontWeight: FontWeight.w400),
+                children: [
+                  TextSpan(text: before),
+                  if (hasMatch)
+                    TextSpan(
+                      text: match,
+                      style: const TextStyle(color: kPrimary, fontWeight: FontWeight.w700),
+                    ),
+                  TextSpan(text: after),
+                ],
+              ),
             ),
           ),
         ],
